@@ -4,7 +4,7 @@ Buku kontak pelanggan satu halaman (HTML). Sinkron antar perangkat memakai Supab
 
 ## Fitur
 - Tambah, ubah, hapus pelanggan
-- Kolom: Nama, Jabatan, Channel, Territory (Kabupaten/Kota), Area salesman, Telepon/WhatsApp, Email, Alamat, Catatan
+- Kolom: Nama Relasi, Nama Pic, Jabatan, Channel, Territory (Kabupaten/Kota), Area salesman, Telepon/WhatsApp, Email, Alamat, Catatan
 - Pencarian teks dan filter Channel, Wilayah, Area salesman
 - Login email + password, data tersinkron langsung antar perangkat
 
