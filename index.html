@@ -166,7 +166,7 @@ $("imp_go").onclick=function(){
   p.then(function(){try{localStorage.removeItem(KEY)}catch(e){}localData=[];b.disabled=false;b.textContent="Unggah ke database bersama";showImport()})
    .catch(function(e){b.disabled=false;b.textContent="Unggah ke database bersama";alert("Gagal mengunggah: "+errMsg(e))});
 };
-var SB_URL="",SB_KEY="";/* isi dari Supabase: Project URL dan anon public key (lihat README) */
+var SB_URL="https://fjhlqojywxnclvcqmsca.supabase.co",SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqaGxxb2p5d3huY2x2Y3Ftc2NhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyNTU0MTksImV4cCI6MjEwODgzMTQxOX0.eDLd0wqBx94zTCrHybsQCXFmuLf7kLyJZieqVp-RfC0";/* isi dari Supabase: Project URL dan anon public key (lihat README) */
 var sb=null,started=false;
 function chk(r){if(r.error)throw r.error}
 function load(){
