@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Database Pelanggan (Copy)</title>
+<style>
+:root{color-scheme:light dark;--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mu:#6b7280;--ac:#2563eb;--on:#fff;--bd:#e5e7eb;--dn:#dc2626;--ok:#16a34a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111418;--card:#1b2027;--tx:#e8eaed;--mu:#9aa3af;--ac:#60a5fa;--on:#0b1220;--bd:#2a313b;--dn:#f87171;--ok:#4ade80}}
+:root[data-theme="dark"]{--bg:#111418;--card:#1b2027;--tx:#e8eaed;--mu:#9aa3af;--ac:#60a5fa;--on:#0b1220;--bd:#2a313b;--dn:#f87171;--ok:#4ade80}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:14px 16px 10px;z-index:5;max-width:640px;margin:0 auto}
+h1{font-size:20px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:baseline}
+h1 small{font-size:13px;color:var(--mu);font-weight:400}
+input,textarea,select{width:100%;padding:12px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);font:inherit}
+textarea{min-height:70px;resize:vertical}
+.flt{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.flt select{flex:1 1 140px;min-width:0;padding:10px}
+.st{margin-top:8px;font-size:12px;color:var(--mu)}
+.st.on{color:var(--ok)}
+.imp{max-width:640px;margin:0 auto;padding:4px 16px 0}
+main{max-width:640px;margin:0 auto;padding:4px 16px 96px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.c b{font-size:17px}
+.c p{margin:2px 0;color:var(--mu);font-size:14px;overflow-wrap:anywhere}
+.c .sub{margin:2px 0 6px;color:var(--ac);font-size:13px;font-weight:500}
+.row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn,a.btn{border:1px solid var(--bd);background:none;color:var(--tx);padding:9px 14px;border-radius:9px;font:inherit;font-size:14px;text-decoration:none;cursor:pointer}
+.btn.p{background:var(--ac);color:var(--on);border-color:var(--ac)}
+.btn.d{color:var(--dn)}
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;border:0;background:var(--ac);color:var(--on);font-size:30px;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;z-index:6}
+.empty{text-align:center;color:var(--mu);padding:40px 10px}
+#ov,#lg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:20}
+#ov.on,#lg.on{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:640px;max-height:92%;overflow:auto;border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.sheet label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+.sheet h2{margin:0 0 4px;font-size:18px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Pelanggan <small id="n"></small><button class="btn" id="lo" style="display:none;padding:4px 10px;font-size:12px">Keluar</button></h1>
+  <input id="q" type="search" placeholder="Cari nama, telepon, email…">
+  <div class="flt">
+    <select id="flt_ch" aria-label="Filter channel"><option value="">Semua channel</option><option>Hospital</option><option>Apotek</option><option>Clinic</option><option>Institusi</option><option>Other</option></select>
+    <select id="flt_tr" aria-label="Filter wilayah"></select>
+    <select id="flt_ar" aria-label="Filter area salesman"><option value="">Semua area</option><option>SAPT1</option><option>SAPT2</option><option>SALL1</option><option>SALL2</option><option>SALL3</option><option>SALL4</option><option>SALL5</option><option>SH1</option><option>SH2</option><option>KCB</option><option>Other</option></select>
+  </div>
+  <div class="st" id="st"></div>
+</header>
+<div class="imp" id="imp" style="display:none"><div class="c"><p id="imp_t"></p><div class="row"><button class="btn p" id="imp_go">Unggah ke database bersama</button></div></div></div>
+<main id="list"></main>
+<button class="fab" id="add" aria-label="Tambah pelanggan">+</button>
+
+<div id="lg"><div class="sheet">
+  <h2>Masuk</h2>
+  <label>Email</label><input id="lg_em" type="email" autocomplete="username">
+  <label>Password</label><input id="lg_pw" type="password" autocomplete="current-password">
+  <p id="lg_er" style="color:var(--dn);font-size:13px"></p>
+  <div class="row"><button class="btn p" id="lg_go">Masuk</button></div>
+</div></div>
+<div id="ov"><div class="sheet">
+  <h2 id="ttl">Tambah pelanggan</h2>
+  <label>Nama *</label><input id="f_nama">
+  <label>Jabatan</label><input id="f_jabatan">
+  <label>Channel</label><select id="f_channel"><option value="">— Pilih —</option><option>Hospital</option><option>Apotek</option><option>Clinic</option><option>Institusi</option><option>Other</option></select>
+  <label>Territory</label><select id="f_terr"><option value="">— Pilih —</option><option>Kabupaten</option><option>Kota</option></select>
+  <input id="f_kab" placeholder="Nama kabupaten / kota" style="margin-top:8px">
+  <label>Area salesman</label><select id="f_area"><option value="">— Pilih —</option><option>SAPT1</option><option>SAPT2</option><option>SALL1</option><option>SALL2</option><option>SALL3</option><option>SALL4</option><option>SALL5</option><option>SH1</option><option>SH2</option><option>KCB</option><option>Other</option></select>
+  <label>No. telepon / WhatsApp</label><input id="f_tel" type="tel" inputmode="tel">
+  <label>Email</label><input id="f_email" type="email">
+  <label>Alamat</label><input id="f_alamat">
+  <label>Catatan</label><textarea id="f_cat"></textarea>
+  <div class="row"><button class="btn p" id="save">Simpan</button><button class="btn" id="cancel">Batal</button></div>
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+var KEY="pelanggan:v1",data=[],localData=[],editId=null,col=null,live=false,canWrite=true;
+try{data=JSON.parse(localStorage.getItem(KEY)||"[]")||[]}catch(e){data=[]}
+localData=data;
+var $=function(i){return document.getElementById(i)};
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function waNum(t){var d=(t||"").replace(/\D/g,"");if(d.indexOf("0")===0)d="62"+d.slice(1);return d}
+function terrLabel(r){return [r.terr,r.kab].filter(Boolean).join(" ")}
+function errMsg(e){return (e&&e.message)||String(e)}
+function persistLocal(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}}
+function setStatus(){
+  var s=$("st");
+  if(live){s.textContent=canWrite?"Tersinkron antar perangkat":"Tersinkron · hanya baca";s.className="st on"}
+  else{s.textContent="Mode lokal: data hanya tersimpan di perangkat ini";s.className="st"}
+  $("add").style.display=canWrite?"":"none";
+}
+function saveRec(id,rec){
+  if(live){col.doc(id).set(rec).catch(function(e){alert("Gagal menyimpan: "+errMsg(e))});return}
+  var full=Object.assign({id:id},rec),i=-1;
+  data.forEach(function(x,k){if(x.id===id)i=k});
+  if(i>-1)data[i]=full;else data.push(full);
+  localData=data;persistLocal();render();
+}
+function delRec(id){
+  if(live){col.doc(id).delete().catch(function(e){alert("Gagal menghapus: "+errMsg(e))});return}
+  data=data.filter(function(x){return x.id!==id});localData=data;persistLocal();render();
+}
+function render(){
+  var q=$("q").value.toLowerCase().trim(),box=$("list");box.textContent="";
+  var fc=$("flt_ch").value,fa=$("flt_ar").value,sel=$("flt_tr"),ft=sel.value,labs=[];
+  data.forEach(function(r){var l=terrLabel(r);if(l&&labs.indexOf(l)<0)labs.push(l)});labs.sort();
+  if(ft&&labs.indexOf(ft)<0)ft="";
+  sel.textContent="";sel.appendChild(new Option("Semua wilayah",""));labs.forEach(function(l){sel.appendChild(new Option(l,l))});sel.value=ft;
+  var rows=data.filter(function(r){if(fc&&r.channel!==fc)return false;if(fa&&r.area!==fa)return false;if(ft&&terrLabel(r)!==ft)return false;return !q||[r.nama,r.jabatan,r.channel,r.terr,r.kab,r.area,r.tel,r.email,r.alamat,r.cat].join(" ").toLowerCase().indexOf(q)>-1})
+    .sort(function(a,b){return (a.nama||"").localeCompare(b.nama||"")});
+  $("n").textContent=(rows.length===data.length?data.length:rows.length+" dari "+data.length)+" kontak";
+  if(!rows.length){box.appendChild(el("div","empty",data.length?"Tidak ada hasil.":"Belum ada data. Ketuk + untuk menambah."));return}
+  rows.forEach(function(r){
+    var c=el("div","c");c.appendChild(el("b",null,r.nama));
+    var sub=[r.jabatan,r.channel,terrLabel(r),r.area].filter(Boolean).join(" · ");if(sub)c.appendChild(el("div","sub",sub));
+    [r.tel,r.email,r.alamat,r.cat].forEach(function(v){if(v)c.appendChild(el("p",null,v))});
+    var row=el("div","row");
+    if(r.tel){
+      var a=el("a","btn","Telepon");a.href="tel:"+r.tel.replace(/[^\d+]/g,"");row.appendChild(a);
+      var w=el("a","btn","WhatsApp");w.href="https://wa.me/"+waNum(r.tel);w.target="_blank";w.rel="noopener";row.appendChild(w);
+    }
+    if(canWrite){
+      var e=el("button","btn","Ubah");e.onclick=function(){openForm(r.id)};row.appendChild(e);
+      var d=el("button","btn d","Hapus");d.onclick=function(){if(confirm("Hapus "+r.nama+"?"))delRec(r.id)};row.appendChild(d);
+    }
+    c.appendChild(row);box.appendChild(c);
+  });
+}
+function openForm(id){
+  editId=id||null;
+  var r=data.filter(function(x){return x.id===id})[0]||{};
+  $("ttl").textContent=id?"Ubah pelanggan":"Tambah pelanggan";
+  $("f_nama").value=r.nama||"";$("f_jabatan").value=r.jabatan||"";
+  var ch=r.channel||"";if(ch&&!Array.prototype.some.call($("f_channel").options,function(o){return o.value===ch})){$("f_channel").appendChild(new Option(ch,ch))}
+  $("f_channel").value=ch;$("f_terr").value=r.terr||"";$("f_area").value=r.area||"";$("f_kab").value=r.kab||"";
+  $("f_tel").value=r.tel||"";$("f_email").value=r.email||"";$("f_alamat").value=r.alamat||"";$("f_cat").value=r.cat||"";
+  $("ov").classList.add("on");$("f_nama").focus();
+}
+function closeForm(){$("ov").classList.remove("on")}
+$("add").onclick=function(){openForm()};
+$("cancel").onclick=closeForm;
+$("ov").onclick=function(e){if(e.target===$("ov"))closeForm()};
+$("q").oninput=render;$("flt_ch").onchange=render;$("flt_tr").onchange=render;$("flt_ar").onchange=render;
+$("save").onclick=function(){
+  var nama=$("f_nama").value.trim();
+  if(!nama){alert("Nama wajib diisi.");return}
+  var rec={nama:nama,jabatan:$("f_jabatan").value.trim(),channel:$("f_channel").value,terr:$("f_terr").value,area:$("f_area").value,kab:$("f_kab").value.trim(),tel:$("f_tel").value.trim(),email:$("f_email").value.trim(),alamat:$("f_alamat").value.trim(),cat:$("f_cat").value.trim()};
+  var id=editId||(Date.now().toString(36)+Math.random().toString(36).slice(2,6));
+  closeForm();saveRec(id,rec);
+};
+function showImport(){
+  var n=localData.length;
+  if(!live||!canWrite||!n){$("imp").style.display="none";return}
+  $("imp_t").textContent="Ada "+n+" kontak tersimpan lokal di perangkat ini yang belum ada di database bersama.";
+  $("imp").style.display="";
+}
+$("imp_go").onclick=function(){
+  var items=localData.slice(),b=$("imp_go");b.disabled=true;b.textContent="Mengunggah…";
+  var p=Promise.resolve();
+  items.forEach(function(it){p=p.then(function(){var o=Object.assign({},it);delete o.id;return col.doc(it.id).set(o)})});
+  p.then(function(){try{localStorage.removeItem(KEY)}catch(e){}localData=[];b.disabled=false;b.textContent="Unggah ke database bersama";showImport()})
+   .catch(function(e){b.disabled=false;b.textContent="Unggah ke database bersama";alert("Gagal mengunggah: "+errMsg(e))});
+};
+var SB_URL="",SB_KEY="";/* isi dari Supabase: Project URL dan anon public key (lihat README) */
+var sb=null,started=false;
+function chk(r){if(r.error)throw r.error}
+function load(){
+  sb.from("pelanggan").select("id,data").then(function(r){
+    if(r.error){$("st").textContent="Gagal memuat: "+r.error.message;return}
+    data=r.data.map(function(x){return Object.assign({id:x.id},x.data)});render();showImport();
+  });
+}
+function onIn(){
+  if(started)return;started=true;$("lo").style.display="";
+  col={doc:function(id){return{
+    set:function(o){return sb.from("pelanggan").upsert({id:id,data:o}).then(chk).then(load)},
+    delete:function(){return sb.from("pelanggan").delete().eq("id",id).then(chk).then(load)}
+  }}};
+  live=true;data=[];setStatus();render();load();
+  sb.channel("pel").on("postgres_changes",{event:"*",schema:"public",table:"pelanggan"},load).subscribe();
+  setInterval(load,30000);
+}
+(function initSb(){
+  if(!SB_URL||!SB_KEY||!window.supabase)return;
+  sb=window.supabase.createClient(SB_URL,SB_KEY);
+  sb.auth.getSession().then(function(r){if(r.data&&r.data.session)onIn();else $("lg").classList.add("on")});
+  $("lg_go").onclick=function(){
+    sb.auth.signInWithPassword({email:$("lg_em").value.trim(),password:$("lg_pw").value}).then(function(r){
+      if(r.error){$("lg_er").textContent="Login gagal: "+r.error.message;return}
+      $("lg").classList.remove("on");onIn();
+    });
+  };
+  $("lo").onclick=function(){sb.auth.signOut().then(function(){location.reload()})};
+})();
+setStatus();render();
+</script>
+</body>
+</html>
